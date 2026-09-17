@@ -1,0 +1,54 @@
+name: Terraform Templates Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  terraform-tests:
+    name: Validate, fmt-check, and run pytest suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+          terraform_wrapper: false
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python test dependencies
+        run: pip install pytest
+
+      - name: Terraform init (root module)
+        run: terraform init -input=false
+
+      - name: Terraform fmt check
+        run: terraform fmt -check -recursive -diff
+
+      - name: Terraform validate (root module)
+        run: terraform validate
+
+      - name: Terraform validate (config-file-generator module, standalone)
+        working-directory: modules/config-file-generator
+        run: |
+          terraform init -input=false
+          terraform validate
+
+      - name: Terraform validate (secrets-placeholder module, standalone)
+        working-directory: modules/secrets-placeholder
+        run: |
+          terraform init -input=false
+          terraform validate
+
+      - name: Run pytest suite (real terraform init/plan/apply/destroy)
+        run: python3 -m pytest tests/test_terraform.py -v

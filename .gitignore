@@ -1,0 +1,34 @@
+# Terraform local working files - these are machine/run specific and
+# should never be committed.
+.terraform/
+.terraform.tfstate.lock.info
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# NOTE ON .terraform.lock.hcl:
+# We DO commit .terraform.lock.hcl (it is NOT ignored here). It pins exact
+# provider versions/hashes so `terraform init` is reproducible for every
+# contributor and in CI. This is the standard HashiCorp recommendation for
+# a project (as opposed to a shared reusable module meant to be consumed
+# by many root modules with looser constraints).
+
+# Generated output artifacts produced by `terraform apply` in this demo
+# (rendered config files + demo secrets files). These are build output,
+# not source, and are recreated by running the workflow in the README.
+/generated/
+**/generated/
+
+# Python test artifacts
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# OS/editor noise
+.DS_Store
+*.swp
